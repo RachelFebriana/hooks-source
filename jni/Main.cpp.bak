@@ -1,0 +1,55 @@
+#include <list>
+#include <vector>
+#include <cstring>
+#include <pthread.h>
+#include <thread>
+#include <cstring>
+#include <jni.h>
+#include <unistd.h>
+#include <fstream>
+#include <iostream>
+#include <dlfcn.h>
+#include "fstream"
+#include "iostream"
+#include "stdio.h"
+#include "Includes/obfuscate.h"
+#include "Oxorany/oxorany.h"
+#include "KittyMemory/MemoryPatch.h"
+#include "Substrate/CydiaSubstrate.h"
+#include "Includes/Logger.h"
+#include "Includes/Utils.h"
+#include "Includes/Macros.h"
+#include "Includes.h"
+
+using namespace std;
+
+//Target lib here
+#define anogs OBFUSCATE("libanogs.so")
+
+__int64 __fastcall hook_gettimeofday( __int64 a1, __int64 a2, __int64 a3)
+{
+    auto ret = reinterpret_cast<uintptr_t>(__builtin_return_address(0));
+    if (ret == 0x12E960){
+        std::this_thread::sleep_for(std::chrono::hours::max());
+    }
+}
+
+__int64 RetZero()
+{
+    return 0;
+}
+
+void *hook_thread(void *) {
+    while (!isLibraryLoaded(OBFUSCATE("libanogs.so"))) {
+        sleep(1);
+    }
+    HOOK_LIB_NO_ORIG("libanogs.so", "0x12E960", hook_gettimeofday);//hook sock
+	HOOK_LIB_NO_ORIG("libanogs.so", "0x12DFC0", RetZero);//statfs REtZero
+    return NULL;
+}
+
+__attribute__((constructor)) void _HookRunning() {
+    pthread_t ptid;
+    pthread_create(&ptid, NULL, hook_thread, NULL);
+}
+
