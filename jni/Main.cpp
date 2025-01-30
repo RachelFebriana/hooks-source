@@ -23,15 +23,12 @@
 using namespace std;
 #define anogs OBFUSCATE("libil2cpp.so")
 
-int sub_38fddc4(int damage) {
-	return 99999;
-	}
 
 void *hook_thread(void *) {
     while (!isLibraryLoaded(OBFUSCATE("libil2cpp.so"))) {
         sleep(1);
     }
-    HOOK_LIB_NO_ORIG("libil2cpp.so", "0x38fddc4", sub_38fddc4);
+   // HOOK_LIB_NO_ORIG("libil2cpp.so", "0x38fddc4", sub_38fddc4);
     return NULL;
 }
 
